@@ -47,12 +47,22 @@ namespace TestAnimalsAPI
 
             using (var client = new APIClientProvider().Client)
             {
+                /*
+                    ARRANGE
+                */
+
+                /*
+                    ACT
+                */
                 var response = await client.GetAsync("/api/animals/2");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var animal = JsonConvert.DeserializeObject<Animal>(responseBody);
 
+                /*
+                    ASSERT
+                */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal("Coconut", animal.Name);
                 Assert.Equal("Northwest African Cheetah", animal.Species);
@@ -69,7 +79,18 @@ namespace TestAnimalsAPI
 
             using (var client = new APIClientProvider().Client)
             {
+                /*
+                    ARRANGE
+                */
+
+                /*
+                    ACT
+                */
                 var response = await client.GetAsync("/api/animals/999999999");
+
+                /*
+                    ASSERT
+                */
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
@@ -80,6 +101,9 @@ namespace TestAnimalsAPI
         {
             using (var client = new APIClientProvider().Client)
             {
+                /*
+                    ARRANGE
+                */
                 Animal Berry = new Animal
                 {
                     Name = "Berry Blue",
@@ -90,7 +114,9 @@ namespace TestAnimalsAPI
                 };
                 var BerryAsJSON = JsonConvert.SerializeObject(Berry);
 
-
+                /*
+                    ACT
+                */
                 var response = await client.PostAsync(
                     "/api/animals",
                     new StringContent(BerryAsJSON, Encoding.UTF8, "application/json")
@@ -100,6 +126,9 @@ namespace TestAnimalsAPI
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var NewBerry = JsonConvert.DeserializeObject<Animal>(responseBody);
 
+                /*
+                    ASSERT
+                */
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Equal(Berry.Name, NewBerry.Name);
                 Assert.Equal(Berry.Species, NewBerry.Species);
@@ -107,8 +136,14 @@ namespace TestAnimalsAPI
                 Assert.Equal(Berry.Legs, NewBerry.Legs);
                 Assert.Equal(Berry.ZooId, NewBerry.ZooId);
 
-
+                /*
+                    ACT
+                */
                 var deleteResponse = await client.DeleteAsync($"/api/animals/{NewBerry.Id}");
+
+                /*
+                    ASSERT
+                */
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
@@ -118,8 +153,18 @@ namespace TestAnimalsAPI
         {
             using (var client = new APIClientProvider().Client)
             {
+                /*
+                    ARRANGE
+                */
+
+                /*
+                    ACT
+                */
                 var deleteResponse = await client.DeleteAsync("/api/animals/600000");
 
+                /*
+                    ASSERT
+                */
                 Assert.False(deleteResponse.IsSuccessStatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
@@ -128,7 +173,7 @@ namespace TestAnimalsAPI
         [Fact]
         public async Task Test_Modify_Animal()
         {
-            // New last name to change to and test
+            // New eating habit value to change to and test
             string NewEatingHabit = "Herbivore";
 
             using (var client = new APIClientProvider().Client)
