@@ -36,15 +36,14 @@ namespace AnimalsAPI.Controllers
         public async Task<IActionResult> Get(string q)
         {
             string SqlCommandText = @"
-                        SELECT z.Id as ZooId, z.[Name], z.Address, z.Acres,
-                        a.Id as AnimalId, a.[Name], a.Species, a.EatingHabit, a.Legs, a.ZooId
+                        SELECT z.Id as ZooId, z.[Name] as ZooName, z.Address, z.Acres,
+                        a.Id as AnimalId, a.[Name] as AnimalName, a.Species, a.EatingHabit, a.Legs, a.ZooId
                         FROM Zoos z
-                        JOIN Animals a ON z.Id = a.ZooId
-                        WHERE 1=1";
+                        JOIN Animals a ON z.Id = a.ZooId";
 
             if (q != null)
             {
-                SqlCommandText = $@"{SqlCommandText} AND (
+                SqlCommandText = $@"{SqlCommandText} WHERE (
                     z.[Name] LIKE @q
                     OR z.Address LIKE @q
                     OR z.Acres LIKE @q
@@ -74,7 +73,7 @@ namespace AnimalsAPI.Controllers
                         Zoo zoo = new Zoo
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("ZooId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Name = reader.GetString(reader.GetOrdinal("ZooName")),
                             Address = reader.GetString(reader.GetOrdinal("Address")),
                             Acres = (float)reader.GetDecimal(reader.GetOrdinal("Acres"))
 
@@ -83,7 +82,7 @@ namespace AnimalsAPI.Controllers
                         Animal animal = new Animal
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("AnimalId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Name = reader.GetString(reader.GetOrdinal("AnimalName")),
                             Species = reader.GetString(reader.GetOrdinal("Species")),
                             EatingHabit = reader.GetString(reader.GetOrdinal("EatingHabit")),
                             Legs = reader.GetInt32(reader.GetOrdinal("Legs")),
