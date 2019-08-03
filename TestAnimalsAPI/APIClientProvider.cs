@@ -1,5 +1,7 @@
 ﻿using AnimalsAPI;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 using System.Net.Http;
 using Xunit;
 
@@ -12,7 +14,16 @@ namespace TestAnimalAPI
 
         public APIClientProvider()
         {
-            Client = _factory.CreateClient();
+            var projectDir = Directory.GetCurrentDirectory();
+            var configPath = Path.Combine(projectDir, "appsettings.json");
+
+            Client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, conf) =>
+                {
+                    conf.AddJsonFile(configPath);
+                });
+            }).CreateClient();
         }
 
         public void Dispose()

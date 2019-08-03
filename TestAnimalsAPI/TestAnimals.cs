@@ -64,7 +64,7 @@ namespace TestAnimalsAPI
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("Coconut", animal.Name);
+                Assert.Equal("Fake Coconut", animal.Name);
                 Assert.Equal("Northwest African Cheetah", animal.Species);
                 Assert.Equal("Carnivore", animal.EatingHabit);
                 Assert.Equal(4, animal.Legs);
