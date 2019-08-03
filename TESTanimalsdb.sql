@@ -4,12 +4,12 @@ GO
 IF NOT EXISTS (
     SELECT [name]
     FROM sys.databases
-    WHERE [name] = N'AnimalsDB'
+    WHERE [name] = N'TestAnimalsDB'
 )
-CREATE DATABASE AnimalsDB
+CREATE DATABASE TestAnimalsDB
 GO
 
-USE AnimalsDB
+USE TestAnimalsDB
 GO
 
 DROP TABLE IF EXISTS Zoos;
