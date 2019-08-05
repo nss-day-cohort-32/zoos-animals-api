@@ -33,16 +33,32 @@ namespace AnimalsAPI.Controllers
 
         // GET: api/Animals
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(int? zooId, string eatingHabit)
         {
+            string SqlCommandText = @"SELECT a.Id, a.[Name], a.Species, a.EatingHabit, a.Legs, a.ZooId
+                    FROM Animals a
+                    WHERE 1 = 1";
+
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT a.Id, a.[Name], a.Species, a.EatingHabit, a.Legs, a.ZooId
-                                        FROM Animals a";
+                    if (zooId != null)
+                    {
+                        SqlCommandText = $"{SqlCommandText} AND a.ZooId = @zooId";
+                        cmd.Parameters.Add(new SqlParameter("@zooId", zooId));
+                    }
+
+                    if (eatingHabit != null)
+                    {
+                        SqlCommandText = $"{SqlCommandText} AND a.EatingHabit = @eatingHabit";
+                        cmd.Parameters.Add(new SqlParameter("@eatingHabit", eatingHabit));
+                    }
+
+                    cmd.CommandText = SqlCommandText;
                     SqlDataReader reader = cmd.ExecuteReader();
+
                     List<Animal> animals = new List<Animal>();
 
                     while (reader.Read())
