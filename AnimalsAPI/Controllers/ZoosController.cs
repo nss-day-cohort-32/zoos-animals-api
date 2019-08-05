@@ -35,6 +35,7 @@ namespace AnimalsAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(string q)
         {
+
             string SqlCommandText = @"
                         SELECT z.Id as ZooId, z.[Name] as ZooName, z.Address, z.Acres,
                         a.Id as AnimalId, a.[Name] as AnimalName, a.Species, a.EatingHabit, a.Legs, a.ZooId
@@ -109,37 +110,75 @@ namespace AnimalsAPI.Controllers
 
         // GET: api/Zoos/5
         [HttpGet("{id}", Name = "Get")]
-        public IActionResult Get([FromRoute] int id)
+        public IActionResult Get([FromRoute] int id, string include)
         {
             if (!ZooExists(id))
             {
                 return new StatusCodeResult(StatusCodes.Status404NotFound);
             }
 
+            string SqlCommandText;
+
+            if (include == "animals")
+            {
+                SqlCommandText = @"
+                SELECT z.Id as ZooId, z.[Name] as ZooName, z.Address, z.Acres,
+                a.Id as AnimalId, a.[Name] as AnimalName, a.Species, a.EatingHabit, a.Legs, a.ZooId
+                FROM Zoos z
+                JOIN Animals a ON z.Id = a.ZooId";
+            }
+            else
+            {
+                SqlCommandText = @"
+                SELECT z.Id as ZooId, z.[Name] as ZooName, z.Address, z.Acres
+                FROM Zoos z";
+            }
+
+            
+
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                        SELECT Id, [Name], Address, Acres
-                        FROM Zoos
-                        WHERE Id = @id";
+                    cmd.CommandText = $"{SqlCommandText} WHERE z.id = @id"; ;
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Zoo zoo = null;
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        zoo = new Zoo
+                        if (zoo == null)
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Address = reader.GetString(reader.GetOrdinal("Address")),
-                            Acres = (float)reader.GetDecimal(reader.GetOrdinal("Acres"))
+                            zoo = new Zoo
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ZooId")),
+                                Name = reader.GetString(reader.GetOrdinal("ZooName")),
+                                Address = reader.GetString(reader.GetOrdinal("Address")),
+                                Acres = (float)reader.GetDecimal(reader.GetOrdinal("Acres"))
 
-                        };
+                            };
+                        }
+
+                        if (include == "animals")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("AnimalId")))
+                            {
+                                zoo.Animals.Add(
+                                    new Animal
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("AnimalId")),
+                                        Name = reader.GetString(reader.GetOrdinal("AnimalName")),
+                                        Species = reader.GetString(reader.GetOrdinal("Species")),
+                                        EatingHabit = reader.GetString(reader.GetOrdinal("EatingHabit")),
+                                        Legs = reader.GetInt32(reader.GetOrdinal("Legs")),
+                                        ZooId = reader.GetInt32(reader.GetOrdinal("ZooId"))
+                                    }
+                                );
+                            }
+                        }
+
                     }
                     reader.Close();
 
