@@ -57,7 +57,7 @@ namespace AnimalsAPI.Controllers
                     }
 
                     cmd.CommandText = SqlCommandText;
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     List<Animal> animals = new List<Animal>();
 
@@ -84,7 +84,7 @@ namespace AnimalsAPI.Controllers
 
         // GET: api/Animals/5
         [HttpGet("{id}", Name = "GetAnimal")]
-        public IActionResult Get([FromRoute] int id)
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             if (!AnimalExists(id))
             {
@@ -102,7 +102,7 @@ namespace AnimalsAPI.Controllers
                         FROM Animals
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     Animal animal = null;
 
@@ -144,7 +144,7 @@ namespace AnimalsAPI.Controllers
                     cmd.Parameters.Add(new SqlParameter("@legs", animal.Legs));
                     cmd.Parameters.Add(new SqlParameter("@zooId", animal.ZooId));
 
-                    int newId = (int)cmd.ExecuteScalar();
+                    int newId = (int)await cmd.ExecuteScalarAsync();
                     animal.Id = newId;
                     return CreatedAtRoute("GetAnimal", new { id = newId }, animal);
                 }
@@ -176,7 +176,7 @@ namespace AnimalsAPI.Controllers
                         cmd.Parameters.Add(new SqlParameter("@zooId", animal.ZooId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         if (rowsAffected > 0)
                         {
                             return new StatusCodeResult(StatusCodes.Status204NoContent);
@@ -212,7 +212,7 @@ namespace AnimalsAPI.Controllers
                         cmd.CommandText = @"DELETE FROM Animals WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         if (rowsAffected > 0)
                         {
                             return new StatusCodeResult(StatusCodes.Status204NoContent);

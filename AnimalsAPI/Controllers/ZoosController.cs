@@ -33,7 +33,7 @@ namespace AnimalsAPI.Controllers
 
         // GET: api/Zoos
         [HttpGet]
-        public async Task<IActionResult> Get(string q)
+        public IActionResult Get(string q)
         {
 
             string SqlCommandText = @"
@@ -109,7 +109,7 @@ namespace AnimalsAPI.Controllers
         }
 
         // GET: api/Zoos/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetZoo")]
         public IActionResult Get([FromRoute] int id, string include)
         {
             if (!ZooExists(id))
@@ -189,7 +189,7 @@ namespace AnimalsAPI.Controllers
 
         // POST: api/Zoos
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Zoo zoo)
+        public IActionResult Post([FromBody] Zoo zoo)
         {
             using (SqlConnection conn = Connection)
             {
@@ -212,7 +212,7 @@ namespace AnimalsAPI.Controllers
 
         // PUT: api/Zoos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Zoo zoo)
+        public IActionResult Put([FromRoute] int id, [FromBody] Zoo zoo)
         {
             try
             {
@@ -253,9 +253,9 @@ namespace AnimalsAPI.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
+        // DELETE: api/Zoos/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public IActionResult Delete([FromRoute] int id)
         {
             try
             {
